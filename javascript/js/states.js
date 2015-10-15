@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var statesFilter = document.getElementById('state-filter-field');
     statesFilter.addEventListener('keyup', function() {
         var filter = this.value.toLowerCase();
-        //console.log(filter);
+        console.log(filter);
         var filteredStates = usaStates.filter(function(state) {
             return state.name.toLowerCase().indexOf(filter) >= 0;
         });
