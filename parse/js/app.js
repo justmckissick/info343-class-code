@@ -2,8 +2,8 @@
     script for the index.html file
 */
 
-Parse.initialize("EoQ6gXfjCy3uFflFdiQOr2vQLUeCyyHx7EPXjPTh", "e2MVQvVmkqmSSnPT92iKRR8bjQ6TR7iUOhsc1e2K");
-
+/* MINE Parse.initialize("EoQ6gXfjCy3uFflFdiQOr2vQLUeCyyHx7EPXjPTh", "e2MVQvVmkqmSSnPT92iKRR8bjQ6TR7iUOhsc1e2K"); */
+Parse.initialize("HwGkNK09YRPy3ZajicPwpZMfX9vqCyc4ghFl2eh7", "14BQF3zAPvaOR1sh6aEzXX5Wk1LTnBFQopjr1Rbj");
 $(function() {
     'use strict';
 
@@ -31,8 +31,19 @@ $(function() {
         errorMessage.hide();
     }
 
+    function showSpinner() {
+        $('fa.spin').show();
+    }
+
+    function hideSpinner() {
+        $('fa.spin').hide();
+    }
+
     function fetchTasks() {
-        tasksQuery.find().then(onData, displayError);
+        showSpinner();
+        tasksQuery.find()
+            .then(onData, displayError)
+            .always(hideSpinner);
     }
 
     function onData(results) {
@@ -57,11 +68,15 @@ $(function() {
         var title = titleInput.val();
         var task = new Task();
         task.set('title', title);
-        task.save().then(fetchTasks, displayError);
+        task.save().then(fetchTasks, displayError).then(function() {
+            titleInput.val('');
+        });
         
         return false;
     });
 
     //go and fetch tasks from the server
     fetchTasks();
+
+    window.setInterval(fetchTasks, 3000)
 });
