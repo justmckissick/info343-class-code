@@ -5,13 +5,7 @@
 angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'])
     .constant('storageKey', 'contacts-list')
     .factory('contacts', function(uuid, localStorageService, storageKey) {
-        return [{
-             id: 'default-delete-me',
-             fname: 'Fred',
-             lname: 'Flintstone',
-             phone: '206-495-3949',
-             dob: '1/1/1900'
-        }];
+        return localStorageService.get(storageKey) || [];
     })
     .config(function($stateProvider, $urlRouterProvider) {
         $stateProvider
@@ -33,6 +27,18 @@ angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'
     
         $urlRouterProvider.otherwise('/contacts');
     })
+    //Register a directive for custom validation of dates in the past
+    .directive('inThePast', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elem, attrs, controller) {
+                controller.$validators.inThePast = function(modelValue) {
+                    var today = new Date();
+                    return (new Date(modelValue) <= today);
+                }
+            }
+        };
+    })
     .controller('ContactsController', function($scope, contacts) {
         $scope.contacts = contacts;
     })
@@ -42,15 +48,24 @@ angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'
         });
         
     })
-    .controller('EditContactController', function($scope, $stateParams, $state, contacts) {
+    .controller('EditContactController', function($scope, $stateParams, $state, uuid, localStorageService, storageKey, contacts) {
         var existingContact = contacts.find(function(contact) {
             return contact.id === $stateParams.id;    
         });
     
         $scope.contact = angular.copy(existingContact);
-    
-        $scope.save = function() {
-            angular.copy($scope.contact, existingContact);
-            $state.go('list');    
-        }
+        console.log('Controller attached');
+        $scope.saveContact = function() {
+            console.log('save called');
+            if ($scope.contact.id) {
+                angular.copy($scope.contact, existingContact);
+            } else {
+                $scope.contact.id = uuid.v4();
+                contacts.push($scope.contact);
+            }
+            
+            localStorageService.set(storageKey, contacts);
+            
+            $state.go('list');
+        };
     });
