@@ -1,7 +1,6 @@
 /*
     script file for the index.html page
 */
-
 angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'])
     .constant('storageKey', 'contacts-list')
     .factory('contacts', function(uuid, localStorageService, storageKey) {
@@ -69,3 +68,4 @@ angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'
             $state.go('list');
         };
     });
+*/
